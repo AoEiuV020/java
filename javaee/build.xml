@@ -1,0 +1,3 @@
+<project default="run" name="JavaProject">  
+	<import file="../java_build.xml" />
+</project>  
