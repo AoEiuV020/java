@@ -7,17 +7,19 @@
         |-out  
         |-build.xml  
     -->  
+    <property name="name" value="Hello" />
     <property name="mainclass" value="cc.aoeiuv020.Main"/>  
+    <property name="root" value="." />
     <property name="verbose" value="false" />
     <property name="encoding" value="UTF-8" />
 	<property name="javac.args" value="" />
 	<property name="java.args" value="" />
-    <property name="lib.dir" value="lib"/>  
-    <property name="src.dir" value="src"/>  
-    <property name="classes.dir" value="bin"/>  
+    <property name="lib.dir" value="${root}/lib"/>  
+    <property name="src.dir" value="${root}/src"/>  
+    <property name="classes.dir" value="${root}/bin"/>  
   
-    <property name="output.dir" value="out"/>  
-    <property name="jarname" value="Main.jar"/>  
+    <property name="out.dir" value="${root}/out"/>  
+	<property name="out.jar" value="${out.dir}/${name}.jar"/>  
   
     <!-- 第三方jar包的路径 -->  
     <path id="lib-classpath">  
@@ -31,7 +33,7 @@
         <mkdir dir="${lib.dir}"/>  
         <mkdir dir="${src.dir}"/>  
         <mkdir dir="${classes.dir}"/>  
-        <mkdir dir="${output.dir}"/>  
+        <mkdir dir="${out.dir}"/>  
     </target>  
   
     <!-- 2. 编译 -->  
@@ -66,7 +68,7 @@
   
     <!-- 3. 打包jar文件 -->  
     <target name="jar" depends="compile">  
-        <copy todir="${output.dir}/lib">  
+        <copy todir="${out.dir}/lib">  
             <fileset dir="${lib.dir}"/>  
         </copy>  
   
@@ -85,7 +87,7 @@
          </pathconvert>  
   
         <!-- jar文件的输出路径 -->  
-        <jar destfile="${output.dir}/${jarname}" basedir="${classes.dir}">  
+        <jar destfile="${out.jar}" basedir="${classes.dir}">  
             <manifest>  
                 <attribute name="Main-class" value="${mainclass}"/>  
                 <attribute name="Class-Path" value="${mf.classpath}"/>  
@@ -95,6 +97,6 @@
     <!-- 清除 -->  
     <target name="clean">  
 		<delete dir="${classes.dir}" failonerror="false" />
-		<delete dir="${output.dir}" failonerror="false" />
+		<delete dir="${out.dir}" failonerror="false" />
     </target>  
 </project>  
