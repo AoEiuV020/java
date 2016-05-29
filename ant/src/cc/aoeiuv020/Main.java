@@ -5,10 +5,7 @@
 	^> Created Time: 2016/05/22 - 22:02:18
 *************************************************** */
 package cc.aoeiuv020;
-public class Main
+import cc.aoeiuv020.java.lang.reflect.MethodTest;
+public class Main extends MethodTest
 {
-	public static void main(String[] args)
-	{
-		System.out.println("hello");
-	}
 }
