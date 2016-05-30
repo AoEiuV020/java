@@ -1,0 +1,156 @@
+<project default="compile" name="Servlet">  
+    <!-- 工程目录结构  
+    project  
+		|-WEB-INF
+			|-classes
+			|-lib
+        |-src  
+        |-out  
+        |-build.xml  
+    -->  
+    <property name="name" value="Hello"/>  
+    <property name="mainclass" value="cc.aoeiuv020.Main"/>  
+    <property name="root" value="."/>  
+	<property name="tomcat.lib" value="../lib/tomcat"/>  
+    <property name="verbose" value="false" />
+    <property name="encoding" value="UTF-8" />
+	<property name="javac.args" value="" />
+	<property name="java.args" value="" />
+	<property name="web.dir" value="${root}/WEB-INF"/>  
+	<property name="lib.dir" value="${web.dir}/lib"/>  
+    <property name="classes.dir" value="${web.dir}/classes"/>  
+    <property name="src.dir" value="${root}/src"/>  
+    <property name="out.dir" value="${root}/out"/>  
+	<property name="jarname" value="${name}.jar"/>  
+	<property name="warname" value="${name}.war"/>  
+  
+    <!-- 第三方jar包的路径 -->  
+    <path id="lib-classpath">  
+        <fileset dir="${lib.dir}">  
+            <include name="**/*.jar"/>  
+        </fileset>  
+        <fileset dir="${tomcat.lib}">  
+            <include name="**/*.jar"/>  
+        </fileset>  
+    </path>  
+  
+    <!-- 1. 初始化工作，如创建目录等 -->  
+    <target name="init">  
+        <mkdir dir="${root}"/>  
+        <mkdir dir="${web.dir}"/>  
+        <mkdir dir="${lib.dir}"/>  
+        <mkdir dir="${src.dir}"/>  
+        <mkdir dir="${classes.dir}"/>  
+        <mkdir dir="${out.dir}"/>  
+		<antcall target="web.xml.make"/>
+    </target>  
+  
+    <!-- 2. 编译 -->  
+    <target name="compile" depends="init">  
+		<javac 
+			srcdir="${src.dir}" 
+			destdir="${classes.dir}"
+			encoding="${encoding}"
+			debug="true"
+			extdirs=""
+			includeantruntime="false"
+			verbose="${verbose}"
+			>  
+            <classpath refid="lib-classpath"/>  
+			<!--
+			<compilerarg value="-J-Dfile.encoding=${encoding}" />
+			-->
+			<compilerarg line="${javac.args}" />
+        </javac>  
+    </target>  
+  
+	<target name="run" depends="compile">  
+		<java
+			classname="${mainclass}"
+			>  
+            <classpath refid="lib-classpath"/>  
+			<classpath path="${classes.dir}"/>  
+			<arg value="-Dfile.encoding=${encoding}" />
+			<arg line="${java.args}" />
+        </java>  
+    </target>  
+  
+    <!-- 3. 打包jar文件 -->  
+    <target name="jar" depends="compile">  
+        <copy todir="${out.dir}/lib">  
+            <fileset dir="${lib.dir}"/>  
+        </copy>  
+  
+        <!--Create a property containing all .jar files,  
+        prefix lib/, and seperated with a space-->  
+        <pathconvert property="mf.classpath" pathsep=" ">  
+            <mapper>  
+                <chainedmapper>  
+                    <!-- jar包文件只留文件名，去掉目录信息 -->  
+                    <flattenmapper/>  
+                    <!-- add lib/ prefix -->  
+                    <globmapper from="*" to="lib/*"/>  
+                </chainedmapper>  
+            </mapper>  
+            <path refid="lib-classpath"/>  
+         </pathconvert>  
+  
+        <!-- jar文件的输出路径 -->  
+        <jar destfile="${out.dir}/${jarname}" basedir="${classes.dir}">  
+            <manifest>  
+                <attribute name="Main-class" value="${mainclass}"/>  
+                <attribute name="Class-Path" value="${mf.classpath}"/>  
+            </manifest>  
+        </jar>  
+    </target>  
+
+    <target name="war" depends="compile" description="打包war文件">
+        <war destfile="${out.dir}/${warname}">
+			<!--
+			<fileset dir="${root}">  
+				<include name="**/*"/>  
+			</fileset>  
+			-->
+            <lib dir="${lib.dir}" />
+            <webinf dir="${web.dir}" />
+            <classes dir="${classes.dir}" />
+        </war>
+    </target>
+
+    <!-- 清除 -->  
+    <target name="clean">  
+		<delete dir="${classes.dir}" failonerror="false" />
+		<delete dir="${out.dir}" failonerror="false" />
+    </target>  
+    <target name="web.xml.exists">  
+		<property name="web.xml" value="${web.dir}/web.xml" />
+		<condition property="web.xml.exists">
+			<available file="${web.xml}"/>
+		</condition>
+    </target>  
+    <target name="web.xml.make" unless="${web.xml.exists}" depends="web.xml.exists">  
+		<echo file="${web.xml}"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                      http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+  version="3.1"
+  metadata-complete="true">
+
+  <display-name>servlet</display-name>
+  <description>
+	  servlet
+  </description>
+  <servlet>
+    <servlet-name>Main</servlet-name>
+    <servlet-class>cc.aoeiuv020.Main</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Main</servlet-name>
+      <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+</web-app>
+]]></echo>
+    </target>  
+  
+</project>  
