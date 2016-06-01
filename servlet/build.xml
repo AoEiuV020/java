@@ -10,7 +10,7 @@
     -->  
     <property name="name" value="Hello"/>  
     <property name="mainclass" value="cc.aoeiuv020.Main"/>  
-    <property name="root" value="."/>  
+    <property name="root" value="main"/>  
 	<property name="tomcat.lib" value="../lib/tomcat"/>  
     <property name="verbose" value="false" />
     <property name="encoding" value="UTF-8" />
@@ -19,8 +19,8 @@
 	<property name="web.dir" value="${root}/WEB-INF"/>  
 	<property name="lib.dir" value="${web.dir}/lib"/>  
     <property name="classes.dir" value="${web.dir}/classes"/>  
-    <property name="src.dir" value="${root}/src"/>  
-    <property name="out.dir" value="${root}/out"/>  
+    <property name="src.dir" value="src"/>  
+    <property name="out.dir" value="out"/>  
 	<property name="jarname" value="${name}.jar"/>  
 	<property name="warname" value="${name}.war"/>  
   
@@ -76,7 +76,17 @@
     </target>  
   
     <!-- 3. 打包jar文件 -->  
-    <target name="jar" depends="compile">  
+    <target name="jar" depends="lib.env">  
+        <!-- jar文件的输出路径 -->  
+        <jar destfile="${out.dir}/${jarname}" basedir="${classes.dir}">  
+            <manifest>  
+                <attribute name="Main-class" value="${mainclass}"/>  
+                <attribute name="Class-Path" value="${mf.classpath}"/>  
+            </manifest>  
+        </jar>  
+    </target>  
+
+    <target name="lib.env" depends="compile">  
         <copy todir="${out.dir}/lib">  
             <fileset dir="${lib.dir}"/>  
         </copy>  
@@ -94,26 +104,22 @@
             </mapper>  
             <path refid="lib-classpath"/>  
          </pathconvert>  
-  
-        <!-- jar文件的输出路径 -->  
-        <jar destfile="${out.dir}/${jarname}" basedir="${classes.dir}">  
+    </target>  
+
+    <target name="war" depends="lib.env" description="打包war文件">
+        <war destfile="${out.dir}/${warname}">
+			<fileset dir="${root}">  
+				<include name="**/*"/>  
+			</fileset>  
+			<!--
+            <lib dir="${lib.dir}" />
+            <webinf dir="${web.dir}" />
+            <classes dir="${classes.dir}" />
+			-->
             <manifest>  
                 <attribute name="Main-class" value="${mainclass}"/>  
                 <attribute name="Class-Path" value="${mf.classpath}"/>  
             </manifest>  
-        </jar>  
-    </target>  
-
-    <target name="war" depends="compile" description="打包war文件">
-        <war destfile="${out.dir}/${warname}">
-			<!--
-			<fileset dir="${root}">  
-				<include name="**/*"/>  
-			</fileset>  
-			-->
-            <lib dir="${lib.dir}" />
-            <webinf dir="${web.dir}" />
-            <classes dir="${classes.dir}" />
         </war>
     </target>
 
@@ -151,6 +157,18 @@
   </servlet-mapping>
 </web-app>
 ]]></echo>
+    </target>  
+  
+	<target name="runjar" depends="jar">  
+		<java
+			jar="${out.dir}/${jarname}"
+			fork="true"
+			>  
+            <classpath refid="lib-classpath"/>  
+			<classpath path="${classes.dir}"/>  
+			<arg value="-Dfile.encoding=${encoding}" />
+			<arg line="${java.args}" />
+        </java>  
     </target>  
   
 </project>  
