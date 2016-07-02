@@ -23,6 +23,17 @@ public class HttpTest
 		System.out.println(get(client,"http://aoeiuv020.cc/ip.php?a=s&d=f"));
 		System.out.println(post(client,"http://aoeiuv020.cc/ip.php",data));
 	}
+	public static String getNoException(OkHttpClient client,String url)
+	{
+		try
+		{
+			return get(client,url);
+		}
+		catch(IOException e)
+		{
+			return e.getMessage();
+		}
+	}
 	public static String get(OkHttpClient client,String url) throws IOException
 	{
 		Request request=new Request.Builder()
