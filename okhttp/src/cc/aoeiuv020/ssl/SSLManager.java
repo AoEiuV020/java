@@ -72,6 +72,10 @@ public class SSLManager
 			throw new RuntimeException(""+protocol+" 协议不支持");
 		}
 	}
+	public static void setDefaultInclude(Certificate... cers)
+	{
+		setDefault(MultiModalTrustManager.getInclude(cers));
+	}
 	public static void setDefaultOnly(Certificate... cers)
 	{
 		setDefault(MultiModalTrustManager.getOnly(cers));

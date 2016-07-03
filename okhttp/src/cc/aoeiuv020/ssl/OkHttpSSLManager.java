@@ -13,6 +13,11 @@ import java.util.*;
 import java.security.cert.*;
 public class OkHttpSSLManager
 {
+	public static void setInclude(OkHttpClient.Builder builder,Certificate... cers)
+	{
+		X509TrustManager[] trust=MultiModalTrustManager.getInclude(cers);
+		set(builder,trust);
+	}
 	public static void setOnly(OkHttpClient.Builder builder,Certificate... cers)
 	{
 		X509TrustManager[] trust=MultiModalTrustManager.getOnly(cers);

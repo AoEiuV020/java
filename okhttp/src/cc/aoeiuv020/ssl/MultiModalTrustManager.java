@@ -10,8 +10,17 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.security.cert.*;
+import java.security.KeyStore;
+/**
+  * 总之就是通过几个方法得到信任管理器，
+  */
 public class MultiModalTrustManager
 {
+	private static final boolean DEBUG=true;
+	public static X509TrustManager[] getInclude(Certificate... cers)
+	{
+		return new X509TrustManager[]{new Include(cers)};
+	}
 	public static X509TrustManager[] getOnly(Certificate... cers)
 	{
 		return new X509TrustManager[]{new Only(cers)};
@@ -24,7 +33,7 @@ public class MultiModalTrustManager
 	{
 		return new X509TrustManager[]{new AllowAll()};
 	}
-	private static final class AllowAll implements X509TrustManager
+	private static class AllowAll implements X509TrustManager
 	{
 		private final X509Certificate[] EMPTY_CERTIFICATE=new X509Certificate[0];
 		@Override
@@ -41,7 +50,7 @@ public class MultiModalTrustManager
 			return EMPTY_CERTIFICATE;
 		}
 	}
-	private static final class DenyAll implements X509TrustManager
+	private static class DenyAll implements X509TrustManager
 	{
 		private final X509Certificate[] EMPTY_CERTIFICATE=new X509Certificate[0];
 		@Override
@@ -59,18 +68,12 @@ public class MultiModalTrustManager
 			return EMPTY_CERTIFICATE;
 		}
 	}
-	private static final class Only implements X509TrustManager
+	private static class Only implements X509TrustManager
 	{
 		private final Set<X509Certificate> accepted=new HashSet<>();
-		public Only()
-		{
-		}
 		public Only(Certificate... cers)
 		{
-			for(Certificate cer:cers)
-			{
-				addCertificate(cer);
-			}
+			addAllCertificate(cers);
 		}
 		@Override
 		public void checkClientTrusted(X509Certificate[] chain, String authType)
@@ -99,6 +102,57 @@ public class MultiModalTrustManager
 			if(certificate instanceof X509Certificate)
 			{
 				accepted.add((X509Certificate)certificate);
+			}
+		}
+		public void addAllCertificate(Certificate... cers)
+		{
+			for(Certificate cer:cers)
+			{
+				addCertificate(cer);
+			}
+		}
+	}
+	private static class Include extends Only
+	{
+		private static X509TrustManager defaultTrustManager;
+		static
+		{
+			try
+			{
+				TrustManagerFactory tmf=TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+				tmf.init((KeyStore)null);
+				TrustManager[] tms=tmf.getTrustManagers();
+				for(TrustManager tm:tms)
+				{
+					if(tm instanceof X509TrustManager)
+					{
+						defaultTrustManager=(X509TrustManager)tm;
+						break;
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				//不可到达，
+				throw new RuntimeException("初始化默认信任管理器失败",e);
+			}
+			assert(defaultTrustManager!=null);
+		}
+		public Include(Certificate... cers)
+		{
+			super(cers);
+		}
+		@Override
+		public void checkServerTrusted(X509Certificate[] chain, String authType)throws CertificateException
+		{
+			try
+			{
+				defaultTrustManager.checkServerTrusted(chain,authType);
+				addAllCertificate(chain);
+			}
+			catch(CertificateException e)
+			{
+				super.checkServerTrusted(chain,authType);
 			}
 		}
 	}

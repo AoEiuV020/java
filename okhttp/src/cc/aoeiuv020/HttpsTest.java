@@ -21,7 +21,15 @@ public class HttpsTest
 		//f1(new OkHttpClient.Builder().build());
 		//f2();
 		//f3();
-		f4();
+		//f4();
+		f5();
+	}
+	//添加受信任的证书，
+	public static void f5()
+	{
+		OkHttpClient.Builder builder=new OkHttpClient.Builder();
+		OkHttpSSLManager.setInclude(builder,CertificateContent.get12306());
+		f1(builder.build());
 	}
 	//设置成只信任12306,默认信任的百度不被信任，
 	public static void f4()

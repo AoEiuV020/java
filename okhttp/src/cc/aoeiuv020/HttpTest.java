@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 public class HttpTest
 {
+	private static final boolean DEBUG=true;
 	public static OkHttpClient client=new OkHttpClient.Builder().build();
 	public static void main(String[] args)throws IOException
 	{
@@ -31,7 +32,10 @@ public class HttpTest
 		}
 		catch(IOException e)
 		{
-			return e.getMessage();
+			if(DEBUG)
+				throw new RuntimeException(e);
+			else
+				return e.getMessage();
 		}
 	}
 	public static String get(OkHttpClient client,String url) throws IOException
