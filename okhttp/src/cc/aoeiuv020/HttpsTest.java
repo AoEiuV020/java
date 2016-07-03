@@ -28,14 +28,14 @@ public class HttpsTest
 	public static void f5()
 	{
 		OkHttpClient.Builder builder=new OkHttpClient.Builder();
-		OkHttpSSLManager.setInclude(builder,CertificateContent.get12306());
+		OkHttpSSLManager.setInclude(builder,CertificateConstant.CER_ALL);
 		f1(builder.build());
 	}
 	//设置成只信任12306,默认信任的百度不被信任，
 	public static void f4()
 	{
 		OkHttpClient.Builder builder=new OkHttpClient.Builder();
-		OkHttpSSLManager.setOnly(builder,CertificateContent.get12306());
+		OkHttpSSLManager.setOnly(builder,CertificateConstant.CER_ALL);
 		f1(builder.build());
 	}
 	//对Builder设置信任所有证书，

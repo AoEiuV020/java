@@ -1,5 +1,5 @@
 /* ***************************************************
-	^> File Name: CertificateContent.java
+	^> File Name: CertificateConstant.java
 	^> Author: AoEiuV020
 	^> Mail: 490674483@qq.com
 	^> Created Time: 2016/07/03 - 02:21:30
@@ -10,26 +10,9 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.security.cert.*;
-public class CertificateContent
+public class CertificateConstant
 {
-	public static X509Certificate[] getCertificates()
-	{
-		return new X509Certificate[]{get12306()};
-	}
-	public static X509Certificate get12306()
-	{
-		try
-		{
-			CertificateFactory cFactory=CertificateFactory.getInstance("X.509");
-			X509Certificate certificate=(X509Certificate)cFactory.generateCertificate(new ByteArrayInputStream(srca_cer.getBytes()));
-			return certificate;
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException("证书处理失败",e);
-		}
-	}
-	public static String srca_cer=
+	public static final String S12306=
 		"-----BEGIN CERTIFICATE-----\n"+
 		"MIICmjCCAgOgAwIBAgIIbyZr5/jKH6QwDQYJKoZIhvcNAQEFBQAwRzELMAkGA1UEBhMCQ04xKTAn\n"+
 		"BgNVBAoTIFNpbm9yYWlsIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MQ0wCwYDVQQDEwRTUkNBMB4X\n"+
@@ -44,4 +27,20 @@ public class CertificateContent
 		"23XQ96HU8xfgSZMJS6U00WHAI7zp0q208RSUft9wDq9ee///VOhzR6Tebg9QfyPSohkBrhXQenvQ\n"+
 		"og555S+C3eJAAVeNCTeMS3N/M5hzBRJAoffn3qoYdAO1Q8bTguOi+2849A==\n"+
 		"-----END CERTIFICATE-----";
+	public static final CertificateFactory FACTORY;
+	public static final X509Certificate[] CER_ALL;
+	public static final X509Certificate CER_12306;
+	static
+	{
+		try
+		{
+			FACTORY=CertificateFactory.getInstance("X.509");
+			CER_12306=(X509Certificate)FACTORY.generateCertificate(new ByteArrayInputStream(S12306.getBytes()));
+		}
+		catch(CertificateException e)
+		{
+			throw new RuntimeException("证书处理失败",e);
+		}
+		CER_ALL=new X509Certificate[]{CER_12306};
+	}
 }
