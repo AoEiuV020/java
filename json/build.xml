@@ -1,0 +1,102 @@
+<project default="run" name="JavaProject">  
+    <!-- 工程目录结构  
+    project  
+        |-bin  
+        |-src  
+        |-lib  
+        |-out  
+        |-build.xml  
+    -->  
+    <property name="name" value="Hello" />
+    <property name="mainclass" value="cc.aoeiuv020.Main"/>  
+    <property name="root" value="." />
+    <property name="verbose" value="false" />
+    <property name="encoding" value="UTF-8" />
+	<property name="javac.args" value="-Xlint:unchecked" />
+	<property name="java.args" value="" />
+    <property name="lib.dir" value="${root}/lib"/>  
+    <property name="src.dir" value="${root}/src"/>  
+    <property name="classes.dir" value="${root}/bin"/>  
+  
+    <property name="out.dir" value="${root}/out"/>  
+	<property name="out.jar" value="${out.dir}/${name}.jar"/>  
+  
+    <!-- 第三方jar包的路径 -->  
+    <path id="lib-classpath">  
+        <fileset dir="${lib.dir}">  
+            <include name="**/*.jar"/>  
+        </fileset>  
+    </path>  
+  
+    <!-- 1. 初始化工作，如创建目录等 -->  
+    <target name="init">  
+        <mkdir dir="${lib.dir}"/>  
+        <mkdir dir="${src.dir}"/>  
+        <mkdir dir="${classes.dir}"/>  
+        <mkdir dir="${out.dir}"/>  
+    </target>  
+  
+    <!-- 2. 编译 -->  
+    <target name="compile" depends="init">  
+		<javac 
+			srcdir="${src.dir}" 
+			destdir="${classes.dir}"
+			encoding="${encoding}"
+			debug="true"
+			extdirs=""
+			includeantruntime="false"
+			verbose="${verbose}"
+			>  
+            <classpath refid="lib-classpath"/>  
+			<!--
+			<compilerarg value="-J-Dfile.encoding=${encoding}" />
+			-->
+			<compilerarg line="${javac.args}" />
+        </javac>  
+    </target>  
+  
+	<target name="run" depends="compile">  
+		<java
+			classname="${mainclass}"
+			>  
+            <classpath refid="lib-classpath"/>  
+			<classpath path="${classes.dir}"/>  
+			<arg value="-Dfile.encoding=${encoding}" />
+			<arg line="${java.args}" />
+        </java>  
+    </target>  
+  
+    <!-- 3. 打包jar文件 -->  
+    <target name="jar" depends="compile">  
+        <copy todir="${out.dir}/lib">  
+            <fileset dir="${lib.dir}"/>  
+        </copy>  
+  
+        <!--Create a property containing all .jar files,  
+        prefix lib/, and seperated with a space-->  
+        <pathconvert property="mf.classpath" pathsep=" ">  
+            <mapper>  
+                <chainedmapper>  
+                    <!-- jar包文件只留文件名，去掉目录信息 -->  
+                    <flattenmapper/>  
+                    <!-- add lib/ prefix -->  
+                    <globmapper from="*" to="lib/*"/>  
+                </chainedmapper>  
+            </mapper>  
+            <path refid="lib-classpath"/>  
+         </pathconvert>  
+  
+        <!-- jar文件的输出路径 -->  
+        <jar destfile="${out.jar}" basedir="${classes.dir}">  
+            <manifest>  
+                <attribute name="Main-class" value="${mainclass}"/>  
+                <attribute name="Class-Path" value="${mf.classpath}"/>  
+            </manifest>  
+        </jar>  
+    </target>  
+    <!-- 清除 -->  
+    <target name="clean">  
+		<delete dir="${classes.dir}" failonerror="false" />
+		<delete dir="${out.dir}" failonerror="false" />
+    </target>  
+</project>  
