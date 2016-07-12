@@ -6,3 +6,5 @@ struts
 tmp
 glassfish4
 classes
+build/
+.gradle/

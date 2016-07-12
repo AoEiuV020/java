@@ -1,0 +1,15 @@
+apply plugin: 'application'
+mainClassName = 'aoeiuv020.Main'
+dependencies {
+	compile fileTree(include: ['*.jar'], dir: 'libs')
+	compile 'com.google.code.gson:gson:2.7'
+	testCompile 'junit:junit:4.12'
+}
+repositories {
+    mavenCentral()
+}
+ext {
+    compileJava.options.encoding = 'UTF-8'
+    compileTestJava.options.encoding = 'UTF-8'
+    sourceCompatibility = 1.6
+}
